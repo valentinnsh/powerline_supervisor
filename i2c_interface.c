@@ -32,6 +32,7 @@ int bmi160_open(struct bmi160_dev *ctx)
   char* name = "/dev/i2c-0";
 
   //Open up the I2C
+  errno = 0;
   file_po = open(name, O_RDWR);
   if (file_po == -1)
   {
@@ -40,6 +41,7 @@ int bmi160_open(struct bmi160_dev *ctx)
   }
 
   // Specify the address of the slave device.(Another shaman stuff)
+  errno = 0;
   if (ioctl(file_po, I2C_SLAVE, BMI160_ADDRESS) < 0)
   {
     perror("Failed to acquire bus access and/or talk to slave");
@@ -79,6 +81,7 @@ int write_to_one_register(int file, unsigned char register_num, unsigned char to
   buf[0] = register_num;
   buf[1] = to_register;
 
+  errno = 0;
   check = write(file, buf, 2);
   if(check != 2){
     perror("Failed to write to the i2c bus");
@@ -90,13 +93,14 @@ int write_to_one_register(int file, unsigned char register_num, unsigned char to
 
 int read_from_one_register(int file, unsigned char register_num, unsigned char *result)
 {
-
+  errno = 0;
   if(write(file, &register_num, 1) < 0)
   {
     perror("Fail, while writing to single register in read_from_one_register function");
     return -1;
   }
 
+  errno = 0;
   if(read(file, result, 1) < 0)
   {
     perror("Fail, while reading from single register in read_from_one_register function");
@@ -106,7 +110,7 @@ int read_from_one_register(int file, unsigned char register_num, unsigned char *
   return 0;
 }
 
-int bmi160_read_array(uint8_t register_num, uint8_t *arr, uint8_t len)
+int bmi160_read_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uint8_t len)
 {
   int check;
 
@@ -117,7 +121,6 @@ int bmi160_read_array(uint8_t register_num, uint8_t *arr, uint8_t len)
   }
 
   check = read(file_po, arr, len);
-  printf("register = %d, file_po = %d, len =  %d, check = %d\n", register_num, file_po, len, check);
   errno = 0;
   if (check != len)
   {
@@ -128,7 +131,7 @@ int bmi160_read_array(uint8_t register_num, uint8_t *arr, uint8_t len)
   return 0;
 }
 
-int bmi160_write_array(uint8_t register_num, uint8_t *arr, uint8_t len)
+int bmi160_write_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uint8_t len)
 {
   int check;
 
@@ -136,6 +139,7 @@ int bmi160_write_array(uint8_t register_num, uint8_t *arr, uint8_t len)
   buf[0] = register_num;
   memcpy(buf + 1, arr, len);
 
+  errno = 0;
   check = write(file_po, buf, len+1);
   if(check != len+1)
   {

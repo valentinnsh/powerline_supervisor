@@ -17,13 +17,11 @@
 #include "i2c_interface.h"
 #include "bmi160_defs.h"
 
-#define BMI160_ADDRESS 0x68 //from i2cdetect 0
 
-#define BMI160_DEV_ADDR      BMI160_ADDRESS
+#define BMI160_DEV_ADDR 0x68
 
 extern int file_po;
 int bmi160_open(struct bmi160_dev *ctx);
-
 
 int main(int argc, char **argv)
 {

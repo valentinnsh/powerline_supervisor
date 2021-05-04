@@ -1,15 +1,35 @@
-# Object files
+#Data
+*.dat
+#Bup
+*~
+*\#*
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
 *.o
+*.obj
 
-# Libraries
-*.lib
-*.a
+# Precompiled Headers
+*.gch
+*.pch
 
-# Shared objects (inc. Windows DLLs)
-*.dll
+# Compiled Dynamic libraries
 *.so
-*.so.*
 *.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
 
 # Executables
 *.exe
