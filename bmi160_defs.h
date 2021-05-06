@@ -756,7 +756,7 @@ enum bmi160_int_status_sel {
  */
 struct bmi160_int_status_bits
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
     uint32_t step : 1;
     uint32_t sigmot : 1;
     uint32_t anym : 1;
@@ -1098,7 +1098,7 @@ enum bmi160_any_sig_motion_active_interrupt_state {
 };
 struct bmi160_acc_tap_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! tap threshold */
     uint16_t tap_thr : 5;
@@ -1140,7 +1140,7 @@ struct bmi160_acc_tap_int_cfg
 };
 struct bmi160_acc_any_mot_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! 1 any-motion enable, 0 - any-motion disable */
     uint8_t anymotion_en : 1;
@@ -1188,7 +1188,7 @@ struct bmi160_acc_any_mot_int_cfg
 };
 struct bmi160_acc_sig_mot_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! skip time of sig-motion interrupt */
     uint8_t sig_mot_skip : 2;
@@ -1224,7 +1224,7 @@ struct bmi160_acc_sig_mot_int_cfg
 };
 struct bmi160_acc_step_detect_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! 1- step detector enable, 0- step detector disable */
     uint16_t step_detector_en : 1;
@@ -1260,7 +1260,7 @@ struct bmi160_acc_step_detect_int_cfg
 };
 struct bmi160_acc_no_motion_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! no motion interrupt x */
     uint16_t no_motion_x : 1;
@@ -1308,7 +1308,7 @@ struct bmi160_acc_no_motion_int_cfg
 };
 struct bmi160_acc_orient_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! thresholds for switching between the different orientations */
     uint16_t orient_mode : 2;
@@ -1356,7 +1356,7 @@ struct bmi160_acc_orient_int_cfg
 };
 struct bmi160_acc_flat_detect_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! flat threshold */
     uint16_t flat_theta : 6;
@@ -1388,7 +1388,7 @@ struct bmi160_acc_flat_detect_int_cfg
 };
 struct bmi160_acc_low_g_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! low-g interrupt trigger delay */
     uint8_t low_dur;
@@ -1430,7 +1430,7 @@ struct bmi160_acc_low_g_int_cfg
 };
 struct bmi160_acc_high_g_int_cfg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! High-g interrupt x, 1 - enable, 0 - disable */
     uint8_t high_g_x : 1;
@@ -1478,7 +1478,7 @@ struct bmi160_acc_high_g_int_cfg
 };
 struct bmi160_int_pin_settg
 {
-#if LITTLE_ENDIAN == 1
+#ifdef LITTLE_ENDIAN
 
     /*! To enable either INT1 or INT2 pin as output.
      * 0- output disabled ,1- output enabled */

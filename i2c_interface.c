@@ -14,15 +14,16 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "i2c_interface.h"
 
 #include "bmi160_defs.h"
 #include "bmi160.h"
 
+#include "i2c_interface.h"
+
+
 #define BMI160_ADDRESS 0x68 //from i2cdetect 0
 
 #define BMI160_DEV_ADDR      BMI160_ADDRESS
-#define LITTLE_ENDIAN 1
 
 int file_po;
 
@@ -187,7 +188,7 @@ void bmi160_delay(unsigned int time_ms)
   usleep(time_ms * 1000);
 }
 
-int8_t set_tap_config(uint8_t feature_enable)
+int8_t set_tap_config(struct bmi160_dev *ctx, uint8_t feature_enable)
 {
     int8_t rslt = BMI160_OK;
     struct bmi160_int_settg int_config;
@@ -217,7 +218,7 @@ int8_t set_tap_config(uint8_t feature_enable)
         int_config.int_type_cfg.acc_tap_int.tap_data_src = 1; /* data source 0 : filter or 1 : pre-filter */
 
         /* Set the Any-motion interrupt */
-        rslt = bmi160_set_int_config(&int_config, &bmi160dev); /* sensor is an instance of the structure bmi160_dev  */
+        rslt = bmi160_set_int_config(&int_config, ctx); /* sensor is an instance of the structure bmi160_dev  */
         printf("bmi160_set_int_config(tap enable) status:%d\n", rslt);
     }
     else
@@ -232,7 +233,7 @@ int8_t set_tap_config(uint8_t feature_enable)
         int_config.int_type_cfg.acc_tap_int.tap_en = BMI160_DISABLE; /* 1- Enable tap, 0- disable tap */
 
         /* Set the Data ready interrupt */
-        rslt = bmi160_set_int_config(&int_config, &bmi160dev); /* sensor is an instance of the structure bmi160_dev */
+        rslt = bmi160_set_int_config(&int_config, ctx); /* sensor is an instance of the structure bmi160_dev */
         printf("bmi160_set_int_config(tap disable) status:%d\n", rslt);
     }
 

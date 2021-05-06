@@ -14,8 +14,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "i2c_interface.h"
 #include "bmi160_defs.h"
+#include "bmi160.h"
+#include "i2c_interface.h"
 
 
 #define BMI160_DEV_ADDR 0x68
@@ -25,23 +26,23 @@ int bmi160_open(struct bmi160_dev *ctx);
 
 int main(int argc, char **argv)
 {
+  (void)argv[argc];
+
   struct bmi160_dev sensor;
-  uint8_t buf[32];
 
   int check_bmi;
+  int rslt;
 
   check_bmi = bmi160_open(&sensor);
   if (check_bmi == -1){
     printf("\nError occured, while openning sensor as i2c slave\n");
   }
-  rslt = set_tap_config(BMI160_ENABLE);
+  rslt = set_tap_config(&sensor, BMI160_ENABLE);
 
   if (rslt == BMI160_OK)
   {
     union bmi160_int_status int_status;
     uint8_t loop = 0;
-    uint32_t last_time = 0;
-    uint32_t current_time = 0;
 
     printf("Do Single or Double Tap the board\n");
     fflush(stdout);
@@ -49,7 +50,7 @@ int main(int argc, char **argv)
     {
       /* Read interrupt status */
       memset(int_status.data, 0x00, sizeof(int_status.data));
-      rslt = bmi160_get_int_status(BMI160_INT_STATUS_ALL, &int_status, &bmi160dev);
+      rslt = bmi160_get_int_status(BMI160_INT_STATUS_ALL, &int_status, &sensor);
 
       /* Enters only if the obtained interrupt is single-tap */
       if (rslt == BMI160_OK)
@@ -79,7 +80,7 @@ int main(int argc, char **argv)
 
     /* Disable tap feature */
     printf("\nDisable tap test...\n");
-    rslt = set_tap_config(BMI160_DISABLE);
+    rslt = set_tap_config(&sensor, BMI160_DISABLE);
     printf("bmi160_set_int_config(tap enable) status:%d\n", rslt);
 
     fflush(stdout);

@@ -233,7 +233,7 @@ int8_t bmi160_set_power_mode(struct bmi160_dev *dev);
  *
  * power_mode Macros possible values for pmu_status->aux_pmu_status :
  *  - BMI160_AUX_PMU_SUSPEND
- *  - BMI160_AUX_PMU_NORMAL
+ *  - BMI160_AUX_PMU_
  *  - BMI160_AUX_PMU_LOW_POWER
  *
  * power_mode Macros possible values for pmu_status->gyro_pmu_status :
