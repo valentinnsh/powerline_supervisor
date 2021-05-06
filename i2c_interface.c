@@ -195,6 +195,7 @@ int8_t set_tap_config(struct bmi160_dev *ctx, uint8_t feature_enable)
 
     if (feature_enable > 0)
     {
+
         /* Select the Interrupt channel/pin */
         int_config.int_channel = BMI160_INT_CHANNEL_1; /* Interrupt channel/pin 1 */
 
@@ -207,19 +208,31 @@ int8_t set_tap_config(struct bmi160_dev *ctx, uint8_t feature_enable)
         int_config.int_pin_settg.latch_dur = BMI160_LATCH_DUR_NONE; /* non-latched output */
 
         /* Select the Interrupt type */
-        int_config.int_type = BMI160_ACC_SINGLE_TAP_INT; /* Choosing tap interrupt */
+        int_config.int_type = BMI160_ACC_ANY_MOTION_INT; /* Choosing tap interrupt */
 
         /* Select the Any-motion interrupt parameters */
+	#if 0
         int_config.int_type_cfg.acc_tap_int.tap_en = BMI160_ENABLE; /* 1- Enable tap, 0- disable tap */
         int_config.int_type_cfg.acc_tap_int.tap_thr = 2; /* Set tap threshold */
         int_config.int_type_cfg.acc_tap_int.tap_dur = 2; /* Set tap duration */
         int_config.int_type_cfg.acc_tap_int.tap_shock = 0; /* Set tap shock value */
         int_config.int_type_cfg.acc_tap_int.tap_quiet = 0; /* Set tap quiet duration */
         int_config.int_type_cfg.acc_tap_int.tap_data_src = 1; /* data source 0 : filter or 1 : pre-filter */
+	#endif
+	/*! 1 any-motion enable, 0 - any-motion disable */
+      int_config.int_type_cfg.acc_any_motion_int.anymotion_en  = BMI160_ENABLE;
+      int_config.int_type_cfg.acc_any_motion_int.anymotion_x  = BMI160_ENABLE;
+      int_config.int_type_cfg.acc_any_motion_int.anymotion_y  = BMI160_ENABLE;
+      int_config.int_type_cfg.acc_any_motion_int.anymotion_z  = BMI160_ENABLE;
+      int_config.int_type_cfg.acc_any_motion_int.anymotion_dur  = 2;
+      int_config.int_type_cfg.acc_any_motion_int.anymotion_data_src  = 1;
+      int_config.int_type_cfg.acc_any_motion_int.anymotion_thr  = 2;
 
         /* Set the Any-motion interrupt */
         rslt = bmi160_set_int_config(&int_config, ctx); /* sensor is an instance of the structure bmi160_dev  */
-        printf("bmi160_set_int_config(tap enable) status:%d\n", rslt);
+	//static int8_t set_accel_any_motion_int(struct bmi160_int_settg *int_config, struct bmi160_dev *dev)
+
+        printf("bmi160_set_int_config(any_motion) status:%d\n", rslt);
     }
     else
     {

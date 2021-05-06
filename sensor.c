@@ -42,7 +42,6 @@ int main(int argc, char **argv)
   if (rslt == BMI160_OK)
   {
     union bmi160_int_status int_status;
-    uint8_t loop = 0;
 
     printf("Do Single or Double Tap the board\n");
     fflush(stdout);
@@ -56,18 +55,13 @@ int main(int argc, char **argv)
       if (rslt == BMI160_OK)
       {
 	/* Enters only if the obtained interrupt is single-tap */
-	if (int_status.bit.s_tap)
+	if (int_status.bit.anym)
 	{
-	  printf("Single tap, iter:%d, int_status:0x%x\n",
-		 loop++,
-		 int_status.data[0]);
-	}
-	/* Enters only if the obtained interrupt is double-tap */
-	else if (int_status.bit.d_tap)
-	{
-	  printf("Double tap, iter:%d, int_status:0x%x\n",
-		 loop++,
-		 int_status.data[0]);
+	  printf("Anymotion int_status:0x%x x %d y %d z %d\n",
+		 int_status.data[0],
+		 int_status.bit.anym_first_x,
+		 int_status.bit.anym_first_y,
+		 int_status.bit.anym_first_z);
 	}
 
 	fflush(stdout);
