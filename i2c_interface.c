@@ -15,11 +15,14 @@
 #include <stdint.h>
 
 #include "i2c_interface.h"
+
 #include "bmi160_defs.h"
+#include "bmi160.h"
 
 #define BMI160_ADDRESS 0x68 //from i2cdetect 0
 
 #define BMI160_DEV_ADDR      BMI160_ADDRESS
+#define LITTLE_ENDIAN 1
 
 int file_po;
 
@@ -35,7 +38,6 @@ struct bmi160_sensor_data bmi160_gyro;
 int bmi160_open(struct bmi160_dev *ctx)
 {
   int8_t check;
-  int times_to_read = 0;
   int rslt;
   char* name = "/dev/i2c-0";
 
@@ -86,24 +88,16 @@ int bmi160_open(struct bmi160_dev *ctx)
   ctx->accel_cfg.power = BMI160_ACCEL_NORMAL_MODE;
 
   /* Select the Output data rate, range of Gyroscope sensor */
-  ctx->gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
-  ctx->gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
-  ctx->gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
+  //ctx->gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
+  //ctx->gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
+  //ctx->gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
 
 
   /* Select the power mode of Gyroscope sensor */
-  ctx->gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
+  //ctx->gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
 
   rslt = bmi160_set_sens_conf(ctx);
-  while (times_to_read < 10)
-  {
-    bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &bmi160_accel, &bmi160_gyro, ctx);
-
-    printf("ax:%d\tay:%d\taz:%d\n", bmi160_accel.x, bmi160_accel.y, bmi160_accel.z);
-    printf("gx:%d\tgy:%d\tgz:%d\n", bmi160_gyro.x, bmi160_gyro.y, bmi160_gyro.z);
-    fflush(stdout);
-    usleep(500000);
-  }
+  printf("res %d\n", rslt);
   return 0;
 }
 
@@ -144,10 +138,11 @@ int read_from_one_register(int file, unsigned char register_num, unsigned char *
   return 0;
 }
 
-int bmi160_read_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uint8_t len)
+int8_t bmi160_read_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uint16_t len)
 {
   int check;
 
+  (void)dev_addr;
   if(write(file_po, &register_num, 1) < 0)
   {
     perror("Fail, while reading from single register in read_from_one_register function");
@@ -165,11 +160,14 @@ int bmi160_read_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uint
   return 0;
 }
 
-int bmi160_write_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uint8_t len)
+
+int8_t bmi160_write_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uint16_t len)
 {
   int check;
 
   unsigned char buf[len+1];
+  (void)dev_addr;
+
   buf[0] = register_num;
   memcpy(buf + 1, arr, len);
 
@@ -187,4 +185,56 @@ int bmi160_write_array(uint8_t dev_addr, uint8_t register_num, uint8_t *arr, uin
 void bmi160_delay(unsigned int time_ms)
 {
   usleep(time_ms * 1000);
+}
+
+int8_t set_tap_config(uint8_t feature_enable)
+{
+    int8_t rslt = BMI160_OK;
+    struct bmi160_int_settg int_config;
+
+    if (feature_enable > 0)
+    {
+        /* Select the Interrupt channel/pin */
+        int_config.int_channel = BMI160_INT_CHANNEL_1; /* Interrupt channel/pin 1 */
+
+        /* Select the interrupt channel/pin settings */
+        int_config.int_pin_settg.output_en = BMI160_ENABLE; /* Enabling interrupt pins to act as output pin */
+        int_config.int_pin_settg.output_mode = BMI160_DISABLE; /* Choosing push-pull mode for interrupt pin */
+        int_config.int_pin_settg.output_type = BMI160_ENABLE; /* Choosing active low output */
+        int_config.int_pin_settg.edge_ctrl = BMI160_DISABLE; /* Choosing edge triggered output */
+        int_config.int_pin_settg.input_en = BMI160_DISABLE; /* Disabling interrupt pin to act as input */
+        int_config.int_pin_settg.latch_dur = BMI160_LATCH_DUR_NONE; /* non-latched output */
+
+        /* Select the Interrupt type */
+        int_config.int_type = BMI160_ACC_SINGLE_TAP_INT; /* Choosing tap interrupt */
+
+        /* Select the Any-motion interrupt parameters */
+        int_config.int_type_cfg.acc_tap_int.tap_en = BMI160_ENABLE; /* 1- Enable tap, 0- disable tap */
+        int_config.int_type_cfg.acc_tap_int.tap_thr = 2; /* Set tap threshold */
+        int_config.int_type_cfg.acc_tap_int.tap_dur = 2; /* Set tap duration */
+        int_config.int_type_cfg.acc_tap_int.tap_shock = 0; /* Set tap shock value */
+        int_config.int_type_cfg.acc_tap_int.tap_quiet = 0; /* Set tap quiet duration */
+        int_config.int_type_cfg.acc_tap_int.tap_data_src = 1; /* data source 0 : filter or 1 : pre-filter */
+
+        /* Set the Any-motion interrupt */
+        rslt = bmi160_set_int_config(&int_config, &bmi160dev); /* sensor is an instance of the structure bmi160_dev  */
+        printf("bmi160_set_int_config(tap enable) status:%d\n", rslt);
+    }
+    else
+    {
+        /* Select the Interrupt channel/pin */
+        int_config.int_channel = BMI160_INT_CHANNEL_1;
+        int_config.int_pin_settg.output_en = BMI160_DISABLE; /* Disabling interrupt pins to act as output pin */
+        int_config.int_pin_settg.edge_ctrl = BMI160_DISABLE; /* Choosing edge triggered output */
+
+        /* Select the Interrupt type */
+        int_config.int_type = BMI160_ACC_SINGLE_TAP_INT; /* Choosing Tap interrupt */
+        int_config.int_type_cfg.acc_tap_int.tap_en = BMI160_DISABLE; /* 1- Enable tap, 0- disable tap */
+
+        /* Set the Data ready interrupt */
+        rslt = bmi160_set_int_config(&int_config, &bmi160dev); /* sensor is an instance of the structure bmi160_dev */
+        printf("bmi160_set_int_config(tap disable) status:%d\n", rslt);
+    }
+
+    return rslt;
 }
