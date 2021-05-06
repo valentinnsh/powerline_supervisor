@@ -24,11 +24,19 @@
 int file_po;
 
 int8_t bmi160_init(struct bmi160_dev *dev);
+int8_t bmi160_get_sensor_data(uint8_t select_sensor,
+                              struct bmi160_sensor_data *accel,
+                              struct bmi160_sensor_data *gyro,
+                              const struct bmi160_dev *dev);
+
+struct bmi160_sensor_data bmi160_accel;
+struct bmi160_sensor_data bmi160_gyro;
 
 int bmi160_open(struct bmi160_dev *ctx)
 {
   int8_t check;
-
+  int times_to_read = 0;
+  int rslt;
   char* name = "/dev/i2c-0";
 
   //Open up the I2C
@@ -69,7 +77,33 @@ int bmi160_open(struct bmi160_dev *ctx)
     printf("BMI160 initialization failure !\n");
     return -1;
   }
+/* Select the Output data rate, range of accelerometer sensor */
+  ctx->accel_cfg.odr = BMI160_ACCEL_ODR_1600HZ;
+  ctx->accel_cfg.range = BMI160_ACCEL_RANGE_16G;
+  ctx->accel_cfg.bw = BMI160_ACCEL_BW_NORMAL_AVG4;
 
+  /* Select the power mode of accelerometer sensor */
+  ctx->accel_cfg.power = BMI160_ACCEL_NORMAL_MODE;
+
+  /* Select the Output data rate, range of Gyroscope sensor */
+  ctx->gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
+  ctx->gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
+  ctx->gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
+
+
+  /* Select the power mode of Gyroscope sensor */
+  ctx->gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
+
+  rslt = bmi160_set_sens_conf(ctx);
+  while (times_to_read < 10)
+  {
+    bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &bmi160_accel, &bmi160_gyro, ctx);
+
+    printf("ax:%d\tay:%d\taz:%d\n", bmi160_accel.x, bmi160_accel.y, bmi160_accel.z);
+    printf("gx:%d\tgy:%d\tgz:%d\n", bmi160_gyro.x, bmi160_gyro.y, bmi160_gyro.z);
+    fflush(stdout);
+    usleep(500000);
+  }
   return 0;
 }
 

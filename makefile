@@ -4,7 +4,7 @@ CFLAGS = -g -W -Wall
 TARGET = main
 OBJFILES = i2c_interface.o bmi160.o sensor.o
 FILES = i2c_interface.c bmi160.c sensor.c
-all: main
+all: clean main
 
 main: $(OBJFILES)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES)
@@ -19,4 +19,4 @@ sensor.o:
 	$(CC) $(CFLAGS) sensor.c -o sensor.o -c
 
 clean:
-	rm *.o main
+	rm -rf *.o main
