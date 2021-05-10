@@ -1,5 +1,5 @@
 # Powerline Subervisor
-St Petersburg University. Shishkin Valentine & Halyavin Maksim, 431.
+St Petersburg University. Shishkin Valentine & Khalyavin Maksim, 431.
 Grid & Cloud Tasks 2021.
 ## Built using
 1. nRF sdk for thread and zigbee
